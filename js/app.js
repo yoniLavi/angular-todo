@@ -1,4 +1,5 @@
-angular.module('TodoApp', ['ngRoute', 'angular-storage', 'RouteControllers', 'UserService',  'TodoService']);
+angular.module('TodoApp', ['ngRoute', 'angular-storage', 'RouteControllers',
+                           'UserService',  'TodoService', 'TodoDirective']);
 
 angular.module('TodoApp').config(function($routeProvider) {
     $routeProvider.when('/', {
@@ -12,5 +13,9 @@ angular.module('TodoApp').config(function($routeProvider) {
     .when('/todo', {
         templateUrl: 'templates/todo.html',
         controller: 'TodoController'
+    })
+    .when('/todo/edit/:id', {
+    templateUrl:'templates/edit-todo.html',
+    controller: 'EditTodoController'
     });
 });
