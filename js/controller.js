@@ -1,8 +1,9 @@
 angular.module('RouteControllers', [])
-    .controller('HomeController', function($scope) {
+    .controller('HomeController', function($scope, store) {
         $scope.title = 'Welcome To Angular Todo!';
+        $scope.username = store.get('username');
     })
-    .controller('RegisterController', function($scope, $q, UserAPIService, store) {
+    .controller('RegisterController', function($scope, $q, $location, UserAPIService, store) {
         $scope.submitForm = function() {
             if ($scope.registrationForm.$valid) { 
                 UserAPIService.register($scope.user.username, $scope.user.password
@@ -16,13 +17,14 @@ angular.module('RouteControllers', [])
                 }).then(function(results) {
                     store.set('authToken', results.data.token);
                     console.log('Successfully logged in with the token', results.data.token);
+                    $location.path("/todo");
                 }).catch(function(err) {
                     console.log('Login failed:', err);
                 });
             }
         };
     })
-    .controller('LoginController', function($scope, UserAPIService, store) {
+    .controller('LoginController', function($scope, $location, UserAPIService, store) {
         $scope.submitForm = function() {
             if ($scope.loginForm.$valid) {
                 UserAPIService.login($scope.user.username, $scope.user.password
@@ -30,6 +32,7 @@ angular.module('RouteControllers', [])
                     store.set('username', $scope.user.username);
                     store.set('authToken', results.data.token);
                     console.log('Successfully logged in with the token', results.data.token);
+                    $location.path("todo");
                 }).catch(function(err) {
                     console.log('Login failed:', err);
                 });
@@ -40,12 +43,11 @@ angular.module('RouteControllers', [])
         store.remove('username');
         store.remove('authToken');
     })
-    .controller('TodoController', function($scope,  $location, TodoAPIService, store) {
+    .controller('TodoController', function($scope, $location, TodoAPIService, store) {
         $scope.authToken = store.get('authToken');
         $scope.username = store.get('username');
-        if (!$scope.username) {
-            throw Error("You must log in before using this page");
-            // Todo: change error to a redirect to login page.
+        if (!$scope.authToken) {
+            $location.path("/accounts/login");
         }
 
         var refreshTodos = function() {
