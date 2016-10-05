@@ -64,9 +64,14 @@ angular.module('RouteControllers', [])
  
         $scope.submitForm = function() {
             if ($scope.todoForm.$valid) {
-                TodoAPIService.createTodo($scope.username, $scope.todo, $scope.authToken).then(function(results) {
+                TodoAPIService.createTodo($scope.username, $scope.todo, $scope.authToken
+                ).then(function(results) {
                     refreshTodos();
                     console.log('Todo created:', results);
+
+                    // Clear and hide the modal
+                    $scope.todo = {};
+                    $('#todo-modal').modal('hide');
                 }).catch(function(err) {
                     console.log('Failed creating todo:', err);
                 });
@@ -78,7 +83,8 @@ angular.module('RouteControllers', [])
         };
  
         $scope.clickDelete = function(id) {
-            TodoAPIService.deleteTodo(id, $scope.username, $scope.authToken).then(function(results) {
+            TodoAPIService.deleteTodo(id, $scope.username, $scope.authToken
+            ).then(function(results) {
                 refreshTodos();
                 console.log('Todo deleted:', results);
             }).catch(function(err) {
@@ -89,7 +95,8 @@ angular.module('RouteControllers', [])
     .controller('EditTodoController', function($scope, $routeParams, TodoAPIService, store) {
         $scope.submitForm = function() {
             if ($scope.todoForm.$valid) {
-                TodoAPIService.editTodo($routeParams.id, $scope.username, $scope.todo, $scope.authToken).then(function(results) {
+                TodoAPIService.editTodo($routeParams.id, $scope.username, $scope.todo, $scope.authToken
+                ).then(function(results) {
                     console.log('Todo edited:', results);
                 }).catch(function(err) {
                     console.log('Failed editing todo:', err);
