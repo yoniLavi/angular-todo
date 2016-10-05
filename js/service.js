@@ -20,19 +20,32 @@ angular.module('TodoService', [])
         TodoAPIService = {
             getTodos: function(username, token) {
                 var header = 'Authorization: JWT ' + token;
-                return $http.get(BACKEND_URL + 'todo/', {params:{'username': username}}, header);
+                var data = {params: {username: username}};
+                return $http.get(BACKEND_URL + 'todo/', data, header);
             },
-            createTodo: function(username, token) {
-                header = 'Authorization: JWT ' + token;
-                return $http.post(BACKEND_URL + 'todo/', {'username': username}, header);
+            createTodo: function(username, todo, token) {
+                var header = 'Authorization: JWT ' + token;
+                var data = {
+                    username: username,
+                    title: todo.title,
+                    description: todo.description,
+                    status: todo.status,
+                };
+                return $http.post(BACKEND_URL + 'todo/', data, header);
             },
-            editTodo: function(id, data, token) {
-                header = 'Authorization: JWT ' + token;
+            editTodo: function(id, username, todo, token) {
+                var header = 'Authorization: JWT ' + token;
+                var data = {
+                    username: username,
+                    title: todo.title,
+                    description: todo.description,
+                    status: todo.status,
+                };
                 return $http.put(BACKEND_URL + 'todo/' + id, data, header);
             },
             deleteTodo: function(id, username, token) {
-                header = 'Authorization: JWT ' + token;
-                return $http.delete(BACKEND_URL + 'todo/' + id, {'username': username}, header);
+                var header = 'Authorization: JWT ' + token;
+                return $http.delete(BACKEND_URL + 'todo/' + id, {username: username}, header);
             }
         };
         return TodoAPIService;
