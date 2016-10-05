@@ -36,6 +36,10 @@ angular.module('RouteControllers', [])
             }
         };
     })
+    .controller('LogoutController', function(store) {
+        store.remove('username');
+        store.remove('authToken');
+    })
     .controller('TodoController', function($scope,  $location, TodoAPIService, store) {
         $scope.authToken = store.get('authToken');
         $scope.username = store.get('username');
