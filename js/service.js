@@ -5,11 +5,13 @@ angular.module('UserService', [])
         UserAPIService = {
             register: function(username, password) {
                 var data = {username: username, password: password};
-                return $http.post(BACKEND_URL + 'accounts/register/', data);
+                var url = BACKEND_URL + 'accounts/register/';
+                return $http.post(url, data);
             },
             login: function(username, password) {
                 var data = {username: username, password: password};
-                return $http.post(BACKEND_URL + 'accounts/api-token-auth/', data);
+                var url = BACKEND_URL + 'accounts/api-token-auth/';
+                return $http.post(url, data);
             },
         };
         return UserAPIService;
@@ -45,7 +47,8 @@ angular.module('TodoService', [])
             },
             deleteTodo: function(id, username, token) {
                 var header = 'Authorization: JWT ' + token;
-                return $http.delete(BACKEND_URL + 'todo/' + id, {username: username}, header);
+                var data = {username: username};
+                return $http.delete(BACKEND_URL + 'todo/' + id, data, header);
             }
         };
         return TodoAPIService;

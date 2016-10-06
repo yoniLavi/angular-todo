@@ -50,6 +50,13 @@ angular.module('RouteControllers', [])
             $location.path("/accounts/login");
         }
 
+        // Initialize with an empty array to avoid race conditions.
+        $scope.todos = $scope.todos || [];
+
+        var findLocalTodo = function(id) {
+            return $scope.todos.find(todo => todo.id == id);
+        }
+
         var refreshTodos = function() {
             TodoAPIService.getTodos($scope.username, $scope.authToken
             ).then(function(results) {
@@ -59,27 +66,45 @@ angular.module('RouteControllers', [])
                 console.log('Failed getting todos:', err);
             });
         }
-
         refreshTodos();
- 
-        $scope.submitForm = function() {
-            if ($scope.todoForm.$valid) {
-                TodoAPIService.createTodo($scope.username, $scope.todo, $scope.authToken
-                ).then(function(results) {
-                    refreshTodos();
-                    console.log('Todo created:', results);
 
-                    // Clear and hide the modal
-                    $scope.todo = {};
-                    $('#todo-modal').modal('hide');
-                }).catch(function(err) {
-                    console.log('Failed creating todo:', err);
-                });
-            }
+
+        $scope.clickCreate = function() {
+            $scope.editedId = null;
+            $scope.todo = {};
+            $('#todo-modal').modal('show');
+        };
+ 
+        $scope.clickEdit = function(id) {
+            $scope.editedId = id;
+            var existingTodo = findLocalTodo(id) || {};
+            // Make copy, to allow cancelling the changes
+            $scope.todo = $.extend({}, existingTodo);
+            $('#todo-modal').modal('show');
         };
 
-        $scope.clickEdit = function(id) {
-            $location.path('/todo/edit/' + id);
+        $scope.submitModal = function() {
+            if ($scope.todoForm.$valid) {
+                if ($scope.editedId) {
+                    TodoAPIService.editTodo($scope.editedId, $scope.username, $scope.todo, $scope.authToken
+                    ).then(function(results) {
+                        refreshTodos();
+                        console.log('Todo saved:', results);
+                        $('#todo-modal').modal('hide');
+                    }).catch(function(err) {
+                        console.log('Failed editing todo:', err);
+                    });
+                } else {
+                TodoAPIService.createTodo($scope.username, $scope.todo, $scope.authToken
+                    ).then(function(results) {
+                        refreshTodos();
+                        console.log('Todo created:', results);
+                        $('#todo-modal').modal('hide');
+                    }).catch(function(err) {
+                        console.log('Failed creating new todo:', err);
+                    });
+                }
+            }
         };
  
         $scope.clickDelete = function(id) {
@@ -90,17 +115,5 @@ angular.module('RouteControllers', [])
             }).catch(function(err) {
                 console.log('Failed deleting todo:', err);
             });
-        };
-    })
-    .controller('EditTodoController', function($scope, $routeParams, TodoAPIService, store) {
-        $scope.submitForm = function() {
-            if ($scope.todoForm.$valid) {
-                TodoAPIService.editTodo($routeParams.id, $scope.username, $scope.todo, $scope.authToken
-                ).then(function(results) {
-                    console.log('Todo edited:', results);
-                }).catch(function(err) {
-                    console.log('Failed editing todo:', err);
-                });
-            }
         };
     });
