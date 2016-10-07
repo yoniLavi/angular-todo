@@ -5,38 +5,40 @@ angular.module('RouteControllers', [])
     })
     .controller('RegisterController', function($scope, $q, $location, UserAPIService, store) {
         $scope.submitForm = function() {
-            if ($scope.registrationForm.$valid) { 
-                UserAPIService.register($scope.user.username, $scope.user.password
-                ).then(function(results) {
-                    console.log('Successfully registered the user', results.data.username);
-                    store.set('username', results.data.username);
-                    return UserAPIService.login($scope.user.username, $scope.user.password);
-                }).catch(function(err) {
-                    console.log('Registration failed:', err);
-                    return $q.reject(err);
-                }).then(function(results) {
-                    store.set('authToken', results.data.token);
-                    console.log('Successfully logged in with the token', results.data.token);
-                    $location.path("/todo");
-                }).catch(function(err) {
-                    console.log('Login failed:', err);
-                });
+            if (!$scope.registrationForm.$valid) {
+                return;
             }
+            UserAPIService.register($scope.user.username, $scope.user.password
+            ).then(function(results) {
+                console.log('Successfully registered the user', results.data.username);
+                store.set('username', results.data.username);
+                return UserAPIService.login($scope.user.username, $scope.user.password);
+            }).catch(function(err) {
+                console.log('Registration failed:', err);
+                return $q.reject(err);
+            }).then(function(results) {
+                store.set('authToken', results.data.token);
+                console.log('Successfully logged in with the token', results.data.token);
+                $location.path("/todo");
+            }).catch(function(err) {
+                console.log('Login failed:', err);
+            });
         };
     })
     .controller('LoginController', function($scope, $location, UserAPIService, store) {
         $scope.submitForm = function() {
-            if ($scope.loginForm.$valid) {
-                UserAPIService.login($scope.user.username, $scope.user.password
-                ).then(function(results) {
-                    store.set('username', $scope.user.username);
-                    store.set('authToken', results.data.token);
-                    console.log('Successfully logged in with the token', results.data.token);
-                    $location.path("todo");
-                }).catch(function(err) {
-                    console.log('Login failed:', err);
-                });
+            if (!$scope.loginForm.$valid) {
+                return;
             }
+            UserAPIService.login($scope.user.username, $scope.user.password
+            ).then(function(results) {
+                store.set('username', $scope.user.username);
+                store.set('authToken', results.data.token);
+                console.log('Successfully logged in with the token', results.data.token);
+                $location.path("/todo");
+            }).catch(function(err) {
+                console.log('Login failed:', err);
+            });
         };
     })
     .controller('LogoutController', function(store) {
@@ -71,7 +73,9 @@ angular.module('RouteControllers', [])
 
         $scope.clickCreate = function() {
             $scope.editedId = null;
-            $scope.todo = {};
+            $scope.todo = {
+                status: "Todo",
+            };
             $('#todo-modal').modal('show');
         };
  
@@ -84,26 +88,27 @@ angular.module('RouteControllers', [])
         };
 
         $scope.submitModal = function() {
-            if ($scope.todoForm.$valid) {
-                if ($scope.editedId) {
-                    TodoAPIService.editTodo($scope.editedId, $scope.username, $scope.todo, $scope.authToken
-                    ).then(function(results) {
-                        refreshTodos();
-                        console.log('Todo saved:', results);
-                        $('#todo-modal').modal('hide');
-                    }).catch(function(err) {
-                        console.log('Failed editing todo:', err);
-                    });
-                } else {
-                TodoAPIService.createTodo($scope.username, $scope.todo, $scope.authToken
-                    ).then(function(results) {
-                        refreshTodos();
-                        console.log('Todo created:', results);
-                        $('#todo-modal').modal('hide');
-                    }).catch(function(err) {
-                        console.log('Failed creating new todo:', err);
-                    });
-                }
+            if (!$scope.todoForm.$valid) {
+                return;
+            }
+            if ($scope.editedId) {
+                TodoAPIService.editTodo($scope.editedId, $scope.username, $scope.todo, $scope.authToken
+                ).then(function(results) {
+                    refreshTodos();
+                    console.log('Todo saved:', results);
+                    $('#todo-modal').modal('hide');
+                }).catch(function(err) {
+                    console.log('Failed editing todo:', err);
+                });
+            } else {
+            TodoAPIService.createTodo($scope.username, $scope.todo, $scope.authToken
+                ).then(function(results) {
+                    refreshTodos();
+                    console.log('Todo created:', results);
+                    $('#todo-modal').modal('hide');
+                }).catch(function(err) {
+                    console.log('Failed creating new todo:', err);
+                });
             }
         };
  
