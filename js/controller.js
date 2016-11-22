@@ -101,7 +101,7 @@ angular.module('RouteControllers', [])
                     console.log('Failed editing todo:', err);
                 });
             } else {
-            TodoAPIService.createTodo($scope.username, $scope.todo, $scope.authToken
+                TodoAPIService.createTodo($scope.username, $scope.todo, $scope.authToken
                 ).then(function(results) {
                     refreshTodos();
                     console.log('Todo created:', results);
