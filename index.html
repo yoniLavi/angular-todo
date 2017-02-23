@@ -2,6 +2,7 @@
 <html data-ng-app='TodoApp'>
 <head>
     <title>Angular Todo</title>
+    <base href="/"> <!-- needed for Angular HTML 5 mode -->
     <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -20,7 +21,7 @@
 </head>
 <body>
     <div data-ng-view>
-       
+
     </div>
 </body>
 </html>
